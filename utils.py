@@ -1,4 +1,4 @@
-import config.hyperparameters as hyperparameters
+from config import hyperparameters
 
 import os
 import pprint
