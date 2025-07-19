@@ -1,4 +1,4 @@
-import config
+import config.hyperparameters as hyperparameters
 
 import os
 import pprint
@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 import torch
 import pytorch_lightning as pl
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 class InfoPrinterCallback(pl.Callback):
     def __init__(self):
@@ -65,8 +66,37 @@ class InfoPrinterCallback(pl.Callback):
             plt.show()
 
 class PlotTestConfusionMatrixCallback(pl.Callback):
-    pass
+    def on_test_end(self, trainer, pl_module):
+        CM = confusion_matrix(pl_module.test_true_labels, pl_module.test_predicted_labels)
+        plt.figure()
+        disp = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=["NORMAL", "PNEUMONIA"])
+        disp.plot()
+        plt.show()
 
 class PlotTrainingLogsCallback(pl.Callback):
-    pass
-
+    def __init__(self):
+        self.training_losses = []
+        self.validation_losses = []
+        
+    def on_train_epoch_end(self, trainer, pl_module):
+        if "train_loss_epoch" in trainer.logged_metrics:
+            train_loss = trainer.logged_metrics["train_loss_epoch"].cpu().numpy()
+            self.training_losses.append(train_loss)
+            
+    def on_validation_epoch_end(self, trainer, pl_module):
+        if trainer.sanity_checking:
+            return
+        
+        if "val_loss" in trainer.callback_metrics:
+            validation_loss = trainer.callback_metrics["val_loss"].cpu().numpy()
+            self.validation_losses.append(validation_loss)
+            
+    def on_fit_end(self, trainer, pl_module):
+        plt.plot(self.training_losses, label="Training Loss")
+        plt.plot(self.validation_losses, label="Validation Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.legend()
+        plt.title("Training and Validation Losses")
+        plt.show()
+        
