@@ -88,7 +88,7 @@ class PneumoniaDataModule(pl.LightningDataModule):
         pneumonia_val_filenames = []
         pneumonia_train_filenames = []
         
-        for filename in os.listdir(os.path.join(input_folder, "PNEUMONIUA")):
+        for filename in os.listdir(os.path.join(input_folder, "PNEUMONIA")):
             if self._is_image_file(filename):
                 patient_id = self._extract_patient_id(filename)
                 if patient_id in pneumonia_val_patient_ids:
