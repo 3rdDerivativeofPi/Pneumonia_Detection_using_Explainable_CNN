@@ -8,3 +8,6 @@ __pycache__/
 # Ignore logs and checkpoints
 lightning_logs/
 model_checkpoints/
+
+# Ignore model files
+models/
