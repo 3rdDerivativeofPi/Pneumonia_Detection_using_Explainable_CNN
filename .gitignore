@@ -1,3 +1,10 @@
 # Ignore data files
 chest_xray/
 archive.zip
+
+# Ignore _pycache_
+__pycache__/
+
+# Ignore logs and checkpoints
+lightning_logs/
+model_checkpoints/

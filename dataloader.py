@@ -29,7 +29,7 @@ class PneumoniaDataModule(pl.LightningDataModule):
     def __init__(self, hyperparams, data_dir):
         super().__init__()
         self.hyperparams = hyperparams
-        self.data_dir = data_dir
+        self.data_dir = os.path.normpath(data_dir)
         
     def setup(self, stage=None):
         data_transforms_train_alb = A.Compose([
@@ -51,14 +51,14 @@ class PneumoniaDataModule(pl.LightningDataModule):
         
         val_split = 0.2
         
-        train_filenames, val_filenames = self._split_file_names(self.data_dir+"train/", val_split)
+        train_filenames, val_filenames = self._split_file_names(os.path.join(self.data_dir, "train"), val_split)
         
         # Load the datasets
-        self.train_dataset = CustomImageFolder(self.data_dir+"train/", transform=data_transforms_train_alb, is_valid_file=lambda x: x in train_filenames)
+        self.train_dataset = CustomImageFolder(os.path.join(self.data_dir, "train"), transform=data_transforms_train_alb, is_valid_file=lambda x: x in train_filenames)
         
-        self.val_dataset = CustomImageFolder(self.data_dir+"train/", transform=data_transform_val_alb, is_valid_file=lambda x: x in val_filenames)
+        self.val_dataset = CustomImageFolder(os.path.join(self.data_dir, "train"), transform=data_transform_val_alb, is_valid_file=lambda x: x in val_filenames)
         
-        self.test_dataset = CustomImageFolder(self.data_dir+"test/", transform=data_transform_val_alb, is_valid_file=lambda x: self._is_image_file(x))
+        self.test_dataset = CustomImageFolder(os.path.join(self.data_dir, "test"), transform=data_transform_val_alb, is_valid_file=lambda x: self._is_image_file(x))
         
     def train_dataloader(self):
         if self.hyperparams["balance"]:
@@ -88,7 +88,7 @@ class PneumoniaDataModule(pl.LightningDataModule):
         pneumonia_val_filenames = []
         pneumonia_train_filenames = []
         
-        for filename in os.listdir(os.path.join(input_folder, "PNEUMONIUA")):
+        for filename in os.listdir(os.path.join(input_folder, "PNEUMONIA")):
             if self._is_image_file(filename):
                 patient_id = self._extract_patient_id(filename)
                 if patient_id in pneumonia_val_patient_ids:

@@ -1,4 +1,4 @@
-from config import hyperparameters
+from resnet50_config import hyperparameters
 
 import torch
 import torch.nn as nn
